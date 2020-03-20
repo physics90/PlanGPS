@@ -1,0 +1,102 @@
+﻿@model PlanGPS.Models.PatientViewModel
+@{
+    ViewBag.Title = "Home";
+}
+
+<div style="padding-top: 75px; text-align:center">
+    <h2>Patient Home</h2>
+    <div style="font-weight:bold; margin: 10px 0px; color:darkred">***Patients in queue longer than 20 days are highlighted in red.</div>
+</div>
+
+<div style="margin: 20px 5px 5px 0px">
+    @Html.ActionLink("Add New Patient", "AddPatient", "Patient", null, new { @class = "btn btn-sm btn-primary", @style = "width:200px; margin: 0px 5px 15px 20px" })
+
+    @if (Model.PatientList != null)
+    {
+        <div class="container">
+            <div id="patientTable">
+                @Html.Action("_PatientTable", new { allPatients = true })
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+    function deletePatient(patientID) {
+        if (confirm("You are about to delete a Patient from the database. This process cannot be undone. \n\nOK to Continue?"))
+        {
+            $.post("@Url.Action("DeletePatient", "Patient")", { patientID: patientID }).done(function (wasDeleted) {
+                if (wasDeleted == "True")
+                {
+                    $("#patientTable").load("_PatientTable", { allPatients: true })
+                    alert("The patient was removed from the database")
+                } else {
+                    alert("An error occured. The patient was not able to be removed from the database")
+                }
+            })
+        }
+        else
+        {
+            alert("The patient was not removed from the database.")
+        }
+    }
+</script>
+
+
+
+
+@*@model RADAR_Web_MVC.Models.LeadApronViewModel
+    <div style="margin: 20px 5px 5px 0px">
+        @if (Model.Facilities != null)
+        {
+            @Html.ActionLink("Add New Apron", "AddApron", "LeadAprons", null, new { @class = "btn btn-sm btn-primary", @style = "width:200px; margin: 0px 5px 15px 20px" })
+            <div style="margin: 10px 5px 5px 20px">
+                <label for="DepartmentFilter">Filter By Department:</label>
+                <select for="DepartmentFilter" id="DepartmentFilter">
+                    <option value="-1">View Aprons In All Departments</option>
+                    @foreach (Facility facility in Model.Facilities.Where(f => f.Departments.Count > 0))
+                    {
+                        <optgroup label='@facility.Name'>
+                            @foreach (Department department in Model.Departments.Where(d => d.Facility.ID == facility.ID).ToList())
+                            {
+                                <option value='@department.ID'>@department.Name</option>
+                            }
+                        </optgroup>
+                    }
+                </select>
+            </div>
+            <div style="margin: 10px 5px 15px 20px">
+                <label for="ApronStatusFilter">Apron Survey Status:</label>
+                <select for="ApronStatusFilter" id="ApronStatusFilter">
+                    <option value="0">All Aprons</option>
+                    <option value="1">Only Overdue Aprons</option>
+                </select>
+            </div>
+            <div class="container">
+                <div id="apronDashboardTable">
+                    @Html.Action("_ApronDashboardTable", new { departmentID = -1, apronStatus = 0 })
+                </div>
+            </div>
+        }
+        else
+        {
+            <div style="text-align:center; font-weight:bold; margin: 10px 0px; color:darkred">***At least one Institution, Facility, and Department must be added to the database in order to add aprons.***</div>
+        }
+    </div>
+
+    <script>
+        $(function () { $('#DepartmentSelect').selectmenu(); })
+
+        function deleteApron(apronID) {
+            if (confirm("You are about to delete a Lead Apron from the database. This process cannot be undone. \n\nOK to Continue?"))
+            {
+                $.post("@Url.Action("DeleteLeadApron", "LeadAprons")", { apronID: apronID });
+
+                alert("The lead apron was removed from the database");
+                $("#apronDashboardTable").load("_ApronDashboardTable", { departmentID: -1, apronStatus: 0 });
+            }
+            else {
+                alert("The lead apron was not removed from the database.");
+            }
+        }
+    </script>*@

@@ -1,0 +1,127 @@
+﻿
+html{
+    display:block;
+}
+body{
+    /*background-color:#446e9b*/
+}
+
+.main-container{
+    background-color:#FFF;
+    margin-top:15px;
+    text-align:center;
+    min-height:500px;
+}
+
+.bodyContainer{
+    width:1500px;
+}
+
+.hdr-img{
+    height:40px;
+    width:40px;
+    border:none;
+    padding-top:5px;
+}
+
+.log-me-in-link{
+    float:right;
+    font-size:12px;
+    padding:0px;
+}
+
+.siteTitle{
+    color:#317eac;
+    font-size:30px;
+    /*style="color:#446e9b*/
+    text-align:left; 
+    padding-top:50px;
+    /*padding-bottom:30px;*/
+}
+
+.fter{
+    background-color:#446e9b;
+    border-top-color:black;
+    border-top:medium;
+    min-height:100px;
+}
+
+th{
+    text-align:center;
+}
+
+.quickLinks{
+    font-size:16px;
+}
+
+.button {
+   border-top: 1px solid #96d1f8;
+   background: #65a9d7;
+   background: -webkit-gradient(linear, left top, left bottom, from(#3e779d), to(#65a9d7));
+   background: -webkit-linear-gradient(top, #3e779d, #65a9d7);
+   background: -moz-linear-gradient(top, #3e779d, #65a9d7);
+   background: -ms-linear-gradient(top, #3e779d, #65a9d7);
+   background: -o-linear-gradient(top, #3e779d, #65a9d7);
+   padding: 5px 10px;
+   -webkit-border-radius: 8px;
+   -moz-border-radius: 8px;
+   border-radius: 8px;
+   -webkit-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   -moz-box-shadow: rgba(0,0,0,1) 0 1px 0;
+   box-shadow: rgba(0,0,0,1) 0 1px 0;
+   text-shadow: rgba(0,0,0,.4) 0 1px 0;
+   color: white;
+   font-size: 25px;
+   font-family: Georgia, serif;
+   text-decoration: none;
+   vertical-align: middle;
+   }
+.button:hover {
+   border-top-color: #28597a;
+   background: #28597a;
+   color: #ccc;
+   }
+.button:active {
+   border-top-color: #1b435e;
+   background: #1b435e;
+   }
+
+.leftPanel{
+    width:400px;
+    height:600px;
+    margin-right:20px;
+    float:left;
+    background:#fcf7f7;
+    border-radius:40px;
+    padding:10px;
+    text-align:center;
+}
+
+.odd{
+    width:600px;
+    margin:auto;
+    text-align:center;
+    background:#fcf7f7;
+    border-radius:40px;
+}
+
+.even{
+    width:600px;
+    margin:auto;
+    text-align:center;
+    background:#fcf7f7;
+    border-radius:40px;
+}
+
+.titleHeader{
+    /*float:left;*/
+    text-align:center;
+    /*color:#DDD;*/
+    color:white;
+    /*text-align: center;
+font-size: 3em;
+color: #DDD;
+text-shadow: 4px 4px 2px rgba(0, 0, 0, 0.3);*/
+}
+
+/*These are the colors for the bootstrap navbar: #6D94BF, #446E9B 50%, #3E648D*/

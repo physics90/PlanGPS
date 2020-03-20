@@ -1,0 +1,58 @@
+﻿@model PlanGPS.Models.PatientViewModel
+@using DataModelLayer;
+
+@if (Model.PatientList.Count > 0)
+{
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>
+                    Patient Name
+                </th>
+                <th>
+                    MRN
+                </th>
+                <th>
+                    Currently In Planning
+                </th>
+                <th>
+                    Total # of Plans
+                </th>
+                <th>
+                    Action
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Patient pat in Model.PatientList)
+            {
+                string colorClass = "default";
+                string yesNo = pat.HasPlanInPlanning ? "Yes" : "No";
+
+                <tr class=@colorClass>
+                    <td style="text-align:left; margin-left:2px; font-weight:bold">
+                        @pat.LastName, @pat.FirstName
+                    </td>
+                    <td style="text-align:center; margin-left:2px">
+                        @pat.MRN
+                    </td>
+                    <td style="text-align:center; margin-left:2px">
+                        @yesNo
+                    </td>
+                    <td style="text-align:center">
+                        @pat.Plans.Count()
+                    </td>
+                    <td style="text-align:center; margin-left:2px">
+                        @Html.ActionLink("Add Plan", "AddPlan", "Plan", new { patientID = pat.ID }, null) |   
+                        @Html.ActionLink("Manage Plans", "ManagePatientPlans", "Plan", new { patientID = pat.ID }) |  
+                        @*<a href="ManageLeadApron?apronID=@apron.ID">Manage Apron</a>*@
+                        @if (pat.Plans.Count() == 0)
+                        {
+                            <a href="#" onclick="deletePatient(@pat.ID)"> Delete Patient</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

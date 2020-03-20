@@ -1,0 +1,94 @@
+﻿@model PlanGPS.Models.AddPatientViewModel
+@using DataModelLayer;
+
+@{
+    ViewBag.Title = "Add New Patient";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="adminBody" style="padding-top:75px">
+    @using (Html.BeginForm("AddPatient", "Patient", FormMethod.Post, new
+    {
+        @class = "form-horizontal",
+        role = "form"@*, style = "background-color:#f0f0f0"*@
+    }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="list-group adminTable" style="margin-bottom:75px">
+            <div class="list-group-item active">
+                Add a New Patient to Database
+            </div>
+
+            <div class="list-group-item adminInfoTable">
+                <div style="margin-top: 4px; margin-bottom:15px; color:darkred">
+                    Patient Details
+                </div>
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.patient.FirstName, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.patient.FirstName, new { htmlAttributes = new { @class = "form-control" } })
+                        <div id="ApronIdentifierMessage" class="text-danger">@ViewBag.ApronIdentifierExists</div>
+                        @Html.ValidationMessageFor(model => model.patient.FirstName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.patient.LastName, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.patient.LastName, new { htmlAttributes = new { @class = "form-control" } })
+                        <div id="ApronIdentifierMessage" class="text-danger">@ViewBag.ApronIdentifierExists</div>
+                        @Html.ValidationMessageFor(model => model.patient.LastName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.patient.MRN, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.patient.MRN, new { htmlAttributes = new { @class = "form-control" } })
+                        <div id="ApronIdentifierMessage" class="text-danger">@ViewBag.ApronIdentifierExists</div>
+                        @Html.ValidationMessageFor(model => model.patient.MRN, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.patient.HasPlanInPlanning, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="checkbox col-md-10">
+                        <label>
+                            @Html.CheckBoxFor(model => model.patient.HasPlanInPlanning, new { htmlAttributes = new { @class = " form-control" } }) Check for yes
+                            @Html.ValidationMessageFor(model => model.patient.HasPlanInPlanning, "", new { @class = "text-danger" })
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input id="submitButton" type="submit" value="Save Patient" class="btn btn-primary" style="width:150px" />
+                        @Html.ActionLink("Back To Dashboard", "Home", "Patient", null, new { @class = "btn btn-primary", @style = "width: 150px; margin: 0px 0px 0px 25px" })
+                    </div>@*; margin: 0px 5px 15px 20px*@
+                </div>
+                <div class="deleteColor">@ViewBag.SaveMessage</div>*
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+    $("#ApronIdentifier").focusout(DoesApronIdentifierExist);
+
+    function DoesApronIdentifierExist() {
+        var identifier = $("#ApronIdentifier").val();
+        $.get("DoesApronIdentifierExist", { identifier }, function (exists) {
+            if (exists == "True") {
+                $("#ApronIdentifierMessage").text("The Apron Identifier entered exists. Please enter a unique Apron Identifier.");
+                $("#submitButton").attr('disabled', 'disabled');
+                $("#UpdateApron").attr('disabled', 'disabled');
+            } else {
+                $("#ApronIdentifierMessage").text("Apron Identifier OK.");
+                $("#submitButton").removeAttr('disabled');
+                $("#UpdateApron").removeAttr('disabled');
+            }
+        })
+    };
+</script>

@@ -1,0 +1,118 @@
+﻿@model PlanGPS.Models.AddPlanViewModel
+@using DataModelLayer;
+
+@{
+    ViewBag.Title = "Add Plan to Database";
+}
+
+<div class="adminBody" style="padding-top:75px">
+    @using (Html.BeginForm("AddPlan", "Plan", FormMethod.Post, new
+    {
+        @class = "form-horizontal",
+        role = "form"@*, style = "background-color:#f0f0f0"*@
+    }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="list-group adminTable" style="margin-bottom:75px">
+            <div class="list-group-item active">
+                Add a New Plan to Database for Patient: @Model.pat.LastName
+            </div>
+
+            <div class="list-group-item adminInfoTable">
+                <div style="margin-top: 4px; margin-bottom:15px; color:darkred">
+                    Plan Details
+                </div>
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.HiddenFor(m => m.PatientID)
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.PlanName, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.PlanName, new { htmlAttributes = new { @class = "form-control" } })
+                        @*<div id="ApronIdentifierMessage" class="text-danger">@ViewBag.ApronIdentifierExists</div>*@
+                        @Html.ValidationMessageFor(model => model.PlanName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.PlanTypeID, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(m => m.PlanTypeID, new SelectList(Model.CreatePlanTypeDDL(), "Value", "Text"), "---Select Plan Type---", htmlAttributes: new { @class = "form-control", style = "width:350px" })
+                        @Html.ValidationMessageFor(model => model.PlanTypeID, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.PhysicistID, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(m => m.PhysicistID, new SelectList(Model.CreatePhysicistDDL(), "Value", "Text"), "---Select Physicist---", htmlAttributes: new { @class = "form-control", style = "width:350px" })
+                        @Html.ValidationMessageFor(model => model.PhysicistID, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.RadOncID, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(m => m.RadOncID, new SelectList(Model.CreateRadOncDDL(), "Value", "Text"), "---Select Rad Onc---", htmlAttributes: new { @class = "form-control", style = "width:350px" })
+                        @Html.ValidationMessageFor(model => model.RadOncID, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.NeuroID, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(m => m.NeuroID, new SelectList(Model.CreateNeuroDDL(), "Value", "Text"), "---Select Neuro---", htmlAttributes: new { @class = "form-control", style = "width:350px" })
+                        @Html.ValidationMessageFor(model => model.NeuroID, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.IsInPlanning, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="checkbox col-md-10">
+                        <label>
+                            @Html.CheckBoxFor(model => model.IsInPlanning, new { htmlAttributes = new { @class = " form-control" } }) Check for yes
+                            @Html.ValidationMessageFor(model => model.IsInPlanning, "", new { @class = "text-danger" })
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.HasPreApproval, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="checkbox col-md-10">
+                        <label>
+                            @Html.CheckBoxFor(model => model.HasPreApproval, new { htmlAttributes = new { @class = " form-control" } }) Check for yes
+                            @Html.ValidationMessageFor(model => model.HasPreApproval, "", new { @class = "text-danger" })
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input id="submitButton" type="submit" value="Save Plan" class="btn btn-primary" style="width:150px" />
+                        @Html.ActionLink("Back To Dashboard", "Home", "Patient", null, new { @class = "btn btn-primary", @style = "width: 150px; margin: 0px 0px 0px 25px" })
+                    </div>@*; margin: 0px 5px 15px 20px*@
+                </div>
+                <div class="deleteColor">@ViewBag.SaveMessage</div>*
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+    $("#ApronIdentifier").focusout(DoesApronIdentifierExist);
+
+    function DoesApronIdentifierExist() {
+        var identifier = $("#ApronIdentifier").val();
+        $.get("DoesApronIdentifierExist", { identifier }, function (exists) {
+            if (exists == "True") {
+                $("#ApronIdentifierMessage").text("The Apron Identifier entered exists. Please enter a unique Apron Identifier.");
+                $("#submitButton").attr('disabled', 'disabled');
+                $("#UpdateApron").attr('disabled', 'disabled');
+            } else {
+                $("#ApronIdentifierMessage").text("Apron Identifier OK.");
+                $("#submitButton").removeAttr('disabled');
+                $("#UpdateApron").removeAttr('disabled');
+            }
+        })
+    };
+</script>
