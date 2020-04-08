@@ -1,0 +1,156 @@
+﻿@model PlanGPS.Models._EventTableViewModel
+@using DataModelLayer;
+
+<div style="text-align: center; margin-top:30px; border-top:1px solid grey">
+    <p class="text-danger">@ViewBag.EventWarning</p>
+</div>
+
+@if (Model.Plan != null)
+{
+    if (Model.SortedEventsByDate.Count() == 0)
+    {
+        <table class="table table-hover" style="width:900px; margin-left:auto; margin-right:auto">
+            <thead>
+                <tr>
+                    <th>
+                        Event
+                    </th>
+                    <th style="text-align:center">
+                        Date
+                    </th>
+                    <th>
+                        Action
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @*@string colorClass = "default";*@
+                <tr>
+                    <td>
+                        @Html.DropDownListFor(m => m.NewEventType, new SelectList(Model.EventTypeList(), "Value", "Text"), "---Select Event Type---", htmlAttributes: new { @class = "form-control", style = "width:300px; margin-left:auto; margin-right:auto" })
+                    </td>
+                    <td>
+                        @Html.EditorFor(m => m.NewEventDateString, new { htmlAttributes = new { @class = "form-control", @id = "datepicker", style = "width: 200px; margin-left:auto; margin-right:auto" } })
+                    </td>
+                    <td style="text-align:center">
+                        <input id="saveEventsLink" type="button" value="Save Event" onclick="saveEvent(@Model.Plan.ID);" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <table class="table table-hover" id="theEventsTable" style="width:900px; margin-left:auto; margin-right:auto">
+            <thead>
+                <tr>
+                    <th style="text-align:center">
+                        Event
+                    </th>
+                    <th style="text-align:center">
+                        Date
+                    </th>
+                    <th style="text-align:center">
+                        Action
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Event ev in Model.SortedEventsByDate)
+                {
+                    string inputID = "editEventLink" + ev.ID;
+                    <tr>
+                        <td style="text-align:center">
+                            @ev.EventType.Name
+                        </td>
+                        <td style="text-align:center">
+                            @ev.EventDate
+                        </td>
+                        <td style="text-align:center">
+                            <input id=@inputID type="button" value="Delete Event" onclick="deleteEvent(@Model.Plan.Patient.ID, @Model.Plan.ID, @ev.ID);" />
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td>
+                        @Html.DropDownListFor(m => m.NewEventType, new SelectList(Model.EventTypeList(), "Value", "Text"), "---Select Event Type---", htmlAttributes: new { @class = "form-control", style = "width:300px; margin-left:auto; margin-right:auto" })
+                    </td>
+                    <td>
+                        @Html.EditorFor(m => m.NewEventDateString, new { htmlAttributes = new { @class = "form-control", @id = "datepicker", style = "width: 200px; margin-left:auto; margin-right:auto" } })
+                    </td>
+                    <td style="text-align:center">
+                        <input id="saveEventsLink" type="button" value="Save Event" onclick="saveEvent(@Model.Plan.Patient.ID, @Model.Plan.ID);" />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    }
+}
+
+@if (Model.Plan == null)
+{
+    <p>Please select a plan above to view events.</p>
+}
+
+<script>
+    //$("#theEventsTable").on("click", "tr", function (e) {
+    //    alert($(e.currentTarget).index() + 1);
+    //});
+
+    function deleteEvent(patID, planID, eventID)
+    {
+        $.post("@Url.Action("DeleteEvent", "Plan")", { eventID: eventID },
+            function (success) {
+                if (success == "True") {
+                    $("#planTable").load("_PlanTable", { patientID: patID });
+                    $("#eventsTable").load("_EventsTable", { planID: planID })
+                }
+            });
+    };
+
+    $(function () {
+        $("#datepicker").datepicker();
+    });
+
+    function saveEvent(patientID, planID)
+    {
+        $.post(
+            "@Url.Action("SaveNewEvent", "Plan")",
+            {
+                planID: planID,
+                eventTypeID: $("#NewEventType").val(),
+                eventDateString: $("#datepicker").val()
+            }, function (success) {
+                if (success == "True") {
+                    $("#planTable").load("_PlanTable", { patientID: patientID });
+                    $("#eventsTable").load("_EventsTable", { planID: planID })
+                }
+            }
+        );
+    };
+</script>
+
+@*function updateApron(apronID) {
+    $.post(
+        "@Url.Action("UpdateLeadApron", "LeadAprons")",
+        {
+        ID: apronID,
+        ApronIdentifier: $("#ApronIdentifier").val(),
+        Description: $("#Description").val(),
+        IsRetired: $("#IsRetired").prop('checked'),
+        Location: $("#Location").val(),
+        ApronTypeID: $("#ApronTypeID").val(),
+        InstitutionID: $("#InstitutionID").val(),
+        FacilityID: $("#FacilityID").val(),
+        DepartmentID: $("#DepartmentID").val()
+        },
+        function (result) {
+        if (result =="True") {
+        alert(result);
+        alert("Apron was updated successfully.");
+        }
+        else {
+        alert("There was a problem with updating the lead apron. Please review your entries above and resubmit.");
+        }
+
+        });*@

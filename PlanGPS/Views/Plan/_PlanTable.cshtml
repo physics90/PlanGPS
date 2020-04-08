@@ -1,0 +1,72 @@
+﻿@model PlanGPS.Models.ManagePlanEventsViewModel
+@using DataModelLayer;
+
+@if (Model.Patient != null)
+{
+    <table id="thePlanTable" class="table table-hover">
+        <thead>
+            <tr>
+                <th>
+                    Plan Name
+                </th>
+                <th>
+                    Plan Type
+                </th>
+                <th>
+                    RadOnc/Neuro
+                </th>
+                <th>
+                    Physicist
+                </th>
+                <th>
+                    Current Stage
+                </th>
+                <th>
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Plan plan in Model.Patient.Plans)
+            {
+                string colorClass = "default";
+
+                <tr class=@colorClass>
+                    <td style="text-align:left; margin-left:2px; font-weight:bold">
+                        @plan.PlanName
+                    </td>
+                    <td style="text-align:center; margin-left:2px">
+                        @plan.PlanType.Type
+                    </td>
+                    <td style="text-align:center; margin-left:2px">
+                        @plan.RadOnc.LastName
+                    </td>
+                    <td style="text-align:center">
+                        @plan.Physicist.LastName
+                    </td>
+                    <td style="text-align:center">
+                        @Model.GetCurrentStageForPlanID(plan.ID)
+                    </td>
+                    <td style="text-align:center; margin-left:2px">
+                        @*<a id="" onclick=""*@
+                        @*@Html.ActionLink("View Events", "ViewPlanEvents", "Plan", new { planID = plan.ID }, null) |*@
+                        <input id="eventsLink" type="button" value="View" onclick="loadEvents(@plan.ID);" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<script>
+    function loadEvents(pID) {
+        $("#eventsTable").load("_EventsTable", { planID: pID })
+    }
+
+</script>
+
+@*<input id="ViewSurvey" type="button" value="View" onclick="loadSurvey(@survey.ID, @Model.ID);" />
+    <input id="UpdateApron" type="button" value="Update Apron Details" onclick="updateApron(@Model.ID);" />
+        $("#patientTable").load("_PatientTable", { allPatients: true })
+
+*@

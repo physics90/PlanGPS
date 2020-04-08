@@ -27,6 +27,24 @@ namespace DataAccessLayer
             
         }
 
+        public List<EventType> GetAllEventTypes()
+        {
+            return context.EventType.ToList();
+        }
+
+        public Plan GetPlanWithPlanID(int planID)
+        {
+            return context.Plan.Find(planID);
+        }
+
+        public List<Plan> GetAllPlansWithPatientID(int patientID)
+        {
+            List<Plan> pList = (from p in context.Plan
+                                where p.Patient.ID == patientID
+                                select p).ToList();
+            return pList;
+        }
+
         public List<Physicist> GetAllPhysicists()
         {
             return context.Physicist.ToList();
@@ -56,6 +74,53 @@ namespace DataAccessLayer
                 plan.PlanType = context.PlanType.Find(planTypeID);
 
                 context.Plan.Add(plan);
+                context.SaveChanges();
+
+                success = true;
+            }
+            catch (Exception)
+            {
+                success = false;
+            }
+
+            return success;
+        }
+
+        public bool DeleteEvent(int eventID)
+        {
+            bool success;
+
+            try
+            {
+                Event ev = context.Event.Find(eventID);
+                context.Event.Remove(ev);
+                context.SaveChanges();
+
+                success = true;
+            }
+            catch (Exception)
+            {
+                success = false;
+            }
+
+            return success;
+        }
+
+        public bool AddNewEvent(int planID, int eventTypeID, DateTime dt)
+        {
+            bool success;
+            try
+            {
+                EventType et = context.EventType.Find(eventTypeID);
+
+                Event e = new Event()
+                {
+                    EventDate = dt,
+                    EventType = et,
+                    PlanID = planID
+                };
+
+                context.Event.Add(e);
                 context.SaveChanges();
 
                 success = true;
@@ -145,24 +210,75 @@ namespace DataAccessLayer
             List<EventType> etList = new List<EventType>();
             EventType et = new EventType()
             {
-                Name = "Image Import Complete",
-                Description = "Importing of all images for planning has been completed"
+                Name = "Planning CT Performed",
+                Description = "Planning CT performed and process started",
+                IsAStage = true,
+                StageID = "0",
+                CurrentStageName = "Imaging"
             };
 
             etList.Add(et);
 
             et = new EventType()
             {
-                Name = "Imaging Complete",
-                Description = "All imaging has been completed"
+                Name = "Imaging Completed",
+                Description = "All imaging has been completed",
+                IsAStage = true,
+                StageID = "1",
+                CurrentStageName = "Image Import (Physics)"
             };
 
             etList.Add(et);
 
             et = new EventType()
             {
-                Name = "Contouring Complete",
-                Description = "All physician contouring has been completed"
+                Name = "Image Import and Fusion Completed",
+                Description = "Importing of all images for planning has been completed",
+                IsAStage = true,
+                StageID = "2",
+                CurrentStageName = "Contouring (Physician)"
+            };
+
+            et = new EventType()
+            {
+                Name = "Image Import for LOT Simulation",
+                Description = "Importing of all images for LOT Simulation has been completed",
+                IsAStage = true,
+                StageID = "2",
+                CurrentStageName = "LOT Planning (Physics)"
+            };
+
+            etList.Add(et);
+
+            et = new EventType()
+            {
+                Name = "LOT Sim Completed",
+                Description = "LOT Simulation completed",
+                IsAStage = true,
+                StageID = "2a",
+                CurrentStageName = "LOT Simulation"
+            };
+
+            etList.Add(et);
+
+            et = new EventType()
+            {
+                Name = "LOT Imported",
+                Description = "LOT Simulation imported",
+                IsAStage = true,
+                StageID = "2b",
+                CurrentStageName = "Contouring (Physician)"
+            };
+
+            etList.Add(et);
+
+            et = new EventType()
+            {
+                Name = "Contouring Completed",
+                Description = "Physician contouring started",
+                IsAStage = true,
+                StageID = "3",
+                CurrentStageName = "Planning (Physics)"
             };
 
             etList.Add(et);
@@ -170,23 +286,41 @@ namespace DataAccessLayer
             et = new EventType()
             {
                 Name = "Plan Ready for Review",
-                Description = "Plan is ready for physician review"
+                Description = "Plan is ready for physician review",
+                IsAStage = true,
+                StageID = "4",
+                CurrentStageName = "Physician Review (Rad Onc)"
             };
 
             etList.Add(et);
 
             et = new EventType()
             {
-                Name = "Plan Reviewed",
-                Description = "Physician reviewed plan"
+                Name = "Plan Reviewed, Revision Requested",
+                Description = "Physician reviewed plan",
+                IsAStage = true,
+                StageID = "5",
+                CurrentStageName = "Planning (Physics)"
+            };
+
+            et = new EventType()
+            {
+                Name = "Plan Approved",
+                Description = "Physician approved plan",
+                IsAStage = true,
+                StageID = "5",
+                CurrentStageName = "Planning (Physics)"
             };
 
             etList.Add(et);
 
             et = new EventType()
             {
-                Name = "Planning Complete",
-                Description = "Planning has been completed"
+                Name = "Planning Finalized",
+                Description = "Planning finialized for second check.",
+                IsAStage = true,
+                StageID = "6",
+                CurrentStageName = "Second check (Physics)"
             };
 
             etList.Add(et);
@@ -194,7 +328,10 @@ namespace DataAccessLayer
             et = new EventType()
             {
                 Name = "Physics Second Check Done",
-                Description = "Plan has been second checked and ready for scheduling"
+                Description = "Plan has been second checked and ready for scheduling",
+                IsAStage = true,
+                StageID = "7",
+                CurrentStageName = "Scheduling (Therapist)"
             };
 
             etList.Add(et);
@@ -202,7 +339,10 @@ namespace DataAccessLayer
             et = new EventType()
             {
                 Name = "Plan Scheduled",
-                Description = "Patient has been scheduled for treatment"
+                Description = "Patient has been scheduled for treatment",
+                IsAStage = true,
+                StageID = "8",
+                CurrentStageName = "Waiting for treatmen to start (Patient)"
             };
 
             etList.Add(et);
@@ -210,7 +350,10 @@ namespace DataAccessLayer
             et = new EventType()
             {
                 Name = "Treatment Started",
-                Description = "Treatment has  started"
+                Description = "Treatment has  started",
+                IsAStage = true,
+                StageID = "9",
+                CurrentStageName = "Completed"
             };
 
             etList.Add(et);
@@ -218,7 +361,10 @@ namespace DataAccessLayer
             et = new EventType()
             {
                 Name = "Planning CT",
-                Description = "Planning CT Date"
+                Description = "Planning CT Date",
+                IsAStage = false,
+                StageID = null,
+                CurrentStageName = ""
             };
 
             etList.Add(et);
@@ -226,7 +372,11 @@ namespace DataAccessLayer
             et = new EventType()
             {
                 Name = "Outside CT",
-                Description = "Additional CT"
+                Description = "Additional CT",
+                IsAStage = false,
+                StageID = null,
+                CurrentStageName = ""
+
             };
 
             etList.Add(et);
@@ -234,7 +384,10 @@ namespace DataAccessLayer
             et = new EventType()
             {
                 Name = "MRI Imaging",
-                Description = "MRI Date"
+                Description = "MRI Date",
+                IsAStage = false,
+                StageID = null,
+                CurrentStageName = ""
             };
 
             etList.Add(et);
@@ -242,7 +395,54 @@ namespace DataAccessLayer
             et = new EventType()
             {
                 Name = "PET Imaging",
-                Description = "PET Date"
+                Description = "PET Date",
+                IsAStage = false,
+                StageID = null,
+                CurrentStageName = ""
+            };
+
+            etList.Add(et);
+
+            et = new EventType()
+            {
+                Name = "Fiducial Placement",
+                Description = "Fiducial placement",
+                IsAStage = false,
+                StageID = null,
+                CurrentStageName = ""
+            };
+
+            etList.Add(et);
+
+            et = new EventType()
+            {
+                Name = "Reimaging",
+                Description = "New/Additional imaging required",
+                IsAStage = true,
+                StageID = "20",
+                CurrentStageName = "Imaging"
+            };
+
+            etList.Add(et);
+
+            et = new EventType()
+            {
+                Name = "Re Eval Plan Type",
+                Description = "New/Additional imaging required",
+                IsAStage = true,
+                StageID = "21",
+                CurrentStageName = "Planning (Physics)"
+            };
+
+            etList.Add(et);
+
+            et = new EventType()
+            {
+                Name = "Insurance Approval",
+                Description = "Date of Insurance Approval/Pre-Approval",
+                IsAStage = true,
+                StageID = "30",
+                CurrentStageName = ""
             };
 
             etList.Add(et);
@@ -329,7 +529,7 @@ namespace DataAccessLayer
         {
             Neurosurgeon ns = new Neurosurgeon()
             {
-                FirstName = "",
+                FirstName = "Matthew",
                 LastName = "Vanlandingham",
                 IsPhysician = true
             };

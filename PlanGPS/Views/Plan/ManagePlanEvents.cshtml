@@ -1,0 +1,52 @@
+﻿@model PlanGPS.Models.ManagePlanEventsViewModel
+@using DataModelLayer;
+
+@{
+    ViewBag.Title = "Manage Plan Events";
+}
+
+<div style="padding-top: 75px; text-align:center">
+    <h2>Manage Plan Events</h2>
+    <div style="font-weight:bold; margin: 10px 0px; color:darkred">*** Select a Plan in the table to add events ***</div>
+</div>
+
+<div style="margin: 20px 5px 5px 0px">
+    @if (Model.PlanList.Count() != 0)
+    {
+        <div class="container">
+            <div id="planTable">
+                @Html.Action("_PlanTable", "Plan", new { patientID = Model.Patient.ID })
+            </div>
+        </div>
+    }
+</div>
+
+<div style="margin: 20px 5px 5px 0px">
+        <div class="container">
+            <div id="eventsTable">
+                @Html.Action("_EventsTable", "Plan", new { planID = -1 })
+            </div>
+        </div>
+</div>
+
+
+@*<div id="surveyContainer" class="radarClearFix" style="clear:both; margin-top:10px; border: 1px solid; width:1002px; background-color:#ededed">
+    <div class="surveyListCol" style="float:left; width:290px">
+        <div>
+            <h5 style="text-align:center; font-weight: bold">Apron Surveys</h5>
+            <hr style="margin:5px; border: 1px solid #808080" />
+        </div>
+        <div id="surveyList">
+            @Html.Action("_SurveyList", new { apronID = Model.ID })
+        </div>
+    </div>
+    <div class="surveyDetailsCol" style="float:right; width:690px">
+        <div>
+            <h5 style="text-align:center; font-weight: bold">Apron survey details</h5>
+            <hr style="margin:5px; border: 1px solid #808080" />
+        </div>
+        <div id="surveyDetails">
+            @Html.Action("_SurveyDetails", new { surveyID = -1, apronID = Model.ID })
+        </div>
+    </div>
+</div>*@

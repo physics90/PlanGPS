@@ -44,7 +44,7 @@
                     </td>
                     <td style="text-align:center; margin-left:2px">
                         @Html.ActionLink("Add Plan", "AddPlan", "Plan", new { patientID = pat.ID }, null) |   
-                        @Html.ActionLink("Manage Plans", "ManagePatientPlans", "Plan", new { patientID = pat.ID }) |  
+                        @Html.ActionLink("Manage Events", "ManagePlanEvents", "Plan", new { patientID = pat.ID }, null) |  
                         @*<a href="ManageLeadApron?apronID=@apron.ID">Manage Apron</a>*@
                         @if (pat.Plans.Count() == 0)
                         {
