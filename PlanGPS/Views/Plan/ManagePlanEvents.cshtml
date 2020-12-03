@@ -22,11 +22,11 @@
 </div>
 
 <div style="margin: 20px 5px 5px 0px">
-        <div class="container">
-            <div id="eventsTable">
-                @Html.Action("_EventsTable", "Plan", new { planID = -1 })
-            </div>
+    <div class="container" >
+        <div id="eventsTable" style="float:left">
+            @Html.Action("_EventsTable", "Plan", new { planID = Model.InitialPlanID })
         </div>
+    </div>
 </div>
 
 

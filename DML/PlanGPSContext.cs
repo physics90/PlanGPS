@@ -29,6 +29,8 @@ namespace DataModelLayer
         public virtual DbSet<RadOnc> RadOnc { get; set; }
         public virtual DbSet<Event> Event { get; set; }
         public virtual DbSet<EventType> EventType { get; set; }
+        public virtual DbSet<EventDurationCategory> EventDurationCategory { get; set; }
+        public virtual DbSet<PlanningStats> PlanningStats { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

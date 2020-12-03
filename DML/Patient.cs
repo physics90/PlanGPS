@@ -16,7 +16,7 @@ namespace DataModelLayer
 
         public Patient(int patientID)
         {
-            this.HasPlanInPlanning = this.Plans != null ? this.Plans.Any(p => p.IsInPlanning == true) : false;
+            //this.HasPlanInPlanning = this.Plans != null ? this.Plans.Any(p => p.IsInPlanning == true) : false;
         }
 
         public int ID { get; set; }
@@ -28,9 +28,6 @@ namespace DataModelLayer
         public string LastName { get; set; }
 
         public string MRN { get; set; }
-
-        [Display(Name = "Is In Planning")]
-        public bool HasPlanInPlanning { get; set; } = false;
 
         public virtual ICollection<Plan> Plans { get; set; }
     }

@@ -17,5 +17,21 @@ namespace PlanGPS.Models
         {
             PatientList = dal.GetAllPatients();
         }
+
+        public bool HasPlanInPlanning(Patient pat)
+        {
+            List<Plan> plans = dal.GetAllPlansWithPatientID(pat.ID);
+
+            bool inPlanning = plans.Count == 0 ? false : plans.Any(c => c.IsInPlanning);
+
+            return inPlanning;
+
+            //if (plans.Count == 0)
+            //{
+            //    return false;
+            //}
+
+            //bool ans = plans.Any(c => c.IsInPlanning)
+        }
     }
 }

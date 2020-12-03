@@ -27,7 +27,7 @@
             @foreach (Patient pat in Model.PatientList)
             {
                 string colorClass = "default";
-                string yesNo = pat.HasPlanInPlanning ? "Yes" : "No";
+                string yesNo = Model.HasPlanInPlanning(pat) ? "Yes" : "No";
 
                 <tr class=@colorClass>
                     <td style="text-align:left; margin-left:2px; font-weight:bold">
@@ -44,7 +44,7 @@
                     </td>
                     <td style="text-align:center; margin-left:2px">
                         @Html.ActionLink("Add Plan", "AddPlan", "Plan", new { patientID = pat.ID }, null) |   
-                        @Html.ActionLink("Manage Events", "ManagePlanEvents", "Plan", new { patientID = pat.ID }, null) |  
+                        @Html.ActionLink("Manage Events", "ManagePlanEvents", "Plan", new { patientID = pat.ID, planID = -1}, null) |  
                         @*<a href="ManageLeadApron?apronID=@apron.ID">Manage Apron</a>*@
                         @if (pat.Plans.Count() == 0)
                         {

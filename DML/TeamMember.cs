@@ -13,6 +13,7 @@ namespace DataModelLayer
         public string LastName { get; set; }
         public bool IsPhysician { get; set; }
         public string LastFirstName { get { return this.LastName + ", " + this.FirstName; } }
+        public string DesiredColor { get; set; }
 
         public virtual ICollection<Plan> Plans { get; set; }
     }

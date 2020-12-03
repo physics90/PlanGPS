@@ -1,0 +1,75 @@
+﻿@*@model PlanGPS.Models._CKPlanTypeDistributionViewModel*@
+
+    <canvas id="physicistChart" style="width:250px; height:160px"></canvas>
+
+<script>
+    //Chart.scaleService.updateScaleDefaults('linear', { ticks: { min: 0 } });
+    @* $.getJSON("@Url.Action("GetPlansPerDoc", "HomeData")").done(function (plotData) {
+        console.log(plotData);*@
+    $(document).ready(plotIt());
+
+    function plotIt() {
+        const ctx = document.getElementById('physicistChart').getContext('2d');
+        const xLabels = [];
+        const yData = [];
+        const bgColor = [];
+
+        $.ajax
+        ({
+            type: 'get',
+            url: "@Url.Action("GetPlansPerPhysicist", "HomeData")",
+            dataType: 'json',
+            success: function (rawData)
+            {
+
+                rawData.forEach(dp =>
+                {
+                    xLabels.push(dp.DPName);
+                    yData.push(dp.DPValue);
+                    bgColor.push(dp.DPColor);
+                });
+
+                var chart = new Chart(ctx, {
+                    type: 'pie',
+                    data:
+                    {
+                        labels: xLabels,
+                        datasets: [{
+                            label: '',
+                            backgroundColor: bgColor,
+                            //borderColor: 'rgb(255, 99, 132)',
+                            data: yData
+                        }]
+                    },
+                    options:
+                    {
+                        legend:
+                        {
+                            position:'right'
+                        },
+                        title:
+                        {
+                            display: true,
+                            text: 'Plans Per Physicist'
+                        }
+                    }
+                    // Configuration options go here
+                    //options: {
+                    //    scales: {
+                    //        yAxes: [{
+                    //            ticks: {
+                    //                min: 0
+                    //            }
+                    //        }]
+                    //    }
+                    //}
+                });
+            }
+        });
+    };
+
+
+
+
+</script>
+

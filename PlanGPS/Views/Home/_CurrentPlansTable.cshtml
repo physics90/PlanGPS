@@ -1,0 +1,62 @@
+﻿@model PlanGPS.Models._CurrentPlansTableViewModel
+@using DataModelLayer
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th style="vertical-align:middle">
+                Patient Name
+            </th>
+            <th>
+                Plan Name
+            </th>
+            <th>
+                Planning Staff
+            </th>
+            <th>
+                Current Stage
+            </th>
+            <th>
+                Planning CT Date
+            </th>
+            <th>
+                Action
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (PlanGPS.Models.CurrentPlanModel planData in Model.CurrentPlanList)
+        {
+            string colorClass = "default";
+
+            <tr class=@colorClass>
+                <td style="text-align:center; margin-left:2px; font-weight:bold">
+                    @planData.Plan.Patient.LastName, @planData.Plan.Patient.FirstName
+                    <br />
+                    MRN: @planData.Plan.Patient.MRN
+                </td>
+                <td style="text-align:center; margin-left:2px">
+                    @planData.Plan.PlanName
+                </td>
+                <td style="text-align:center; margin-left:2px">
+                    @planData.Plan.RadOnc.LastName / @planData.Plan.Physicist.LastName
+                </td>
+                <td style="text-align:center; margin-left:2px">
+                    @planData.CurrentStage (@planData.CurrentStageType.EventDurationCategory.Name)
+                    <br />
+                    Days in Stage: @planData.DaysInStage
+                </td>
+                <td style="text-align:center; margin-left:2px">
+                    @planData.Plan.Events.First().EventDate.ToLongDateString()
+                    <br />
+                    Total Days: @planData.TotalDays
+                </td>
+                <td>
+                    @Html.ActionLink("Manage Events", "ManagePlanEvents", "Plan", new { patientID = planData.Plan.Patient.ID, planID = planData.Plan.ID }, null)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+

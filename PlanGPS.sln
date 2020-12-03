@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.1022
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlanGPS", "PlanGPS\PlanGPS.csproj", "{108DCA53-DCD0-44F3-8B01-F9D5C93138B1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlanGPS-MVC", "PlanGPS\PlanGPS-MVC.csproj", "{108DCA53-DCD0-44F3-8B01-F9D5C93138B1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DML", "DML\DML.csproj", "{5C6835C9-4F33-4953-B7CA-56F56F70672C}"
 EndProject

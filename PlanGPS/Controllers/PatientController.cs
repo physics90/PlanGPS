@@ -28,7 +28,7 @@ namespace PlanGPS.Controllers
         //POST
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult AddPatient([Bind(Include = "LastName, FirstName, MRN, IsInPlanning")] Patient patient)
+        public ActionResult AddPatient([Bind(Include = "LastName, FirstName, MRN")] Patient patient)
         {
             //Create a New Patient
             DAL dal = new DAL();

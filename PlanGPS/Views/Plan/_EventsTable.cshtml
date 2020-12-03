@@ -7,9 +7,10 @@
 
 @if (Model.Plan != null)
 {
-    if (Model.SortedEventsByDate.Count() == 0)
+<div style="float:left">
+    @if (Model.SortedEventsByDate.Count() == 0)
     {
-        <table class="table table-hover" style="width:900px; margin-left:auto; margin-right:auto">
+        <table class="table table-hover" style="width:600px; margin-left:auto; margin-right:auto">
             <thead>
                 <tr>
                     <th>
@@ -33,7 +34,7 @@
                         @Html.EditorFor(m => m.NewEventDateString, new { htmlAttributes = new { @class = "form-control", @id = "datepicker", style = "width: 200px; margin-left:auto; margin-right:auto" } })
                     </td>
                     <td style="text-align:center">
-                        <input id="saveEventsLink" type="button" value="Save Event" onclick="saveEvent(@Model.Plan.ID);" />
+                        <input id="saveEventsLink" type="button" value="Save Event" onclick="saveEvent(@Model.Plan.Patient.ID, @Model.Plan.ID);" />
                     </td>
                 </tr>
             </tbody>
@@ -41,7 +42,7 @@
     }
     else
     {
-        <table class="table table-hover" id="theEventsTable" style="width:900px; margin-left:auto; margin-right:auto">
+        <table class="table table-hover" id="theEventsTable" style="width:600px; margin-left:auto; margin-right:auto">
             <thead>
                 <tr>
                     <th style="text-align:center">
@@ -64,7 +65,7 @@
                             @ev.EventType.Name
                         </td>
                         <td style="text-align:center">
-                            @ev.EventDate
+                            @ev.EventDate.ToLongDateString()
                         </td>
                         <td style="text-align:center">
                             <input id=@inputID type="button" value="Delete Event" onclick="deleteEvent(@Model.Plan.Patient.ID, @Model.Plan.ID, @ev.ID);" />
@@ -85,14 +86,33 @@
             </tbody>
         </table>
     }
+
+</div>
+<div style="margin: 0px 0px 0px 150px; float:right">
+        <table>
+            <thead>
+                <tr>
+                    <th>Stage</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (EventType evType in Model.AllStagesList())
+                {
+                    <tr>
+                        <td>@evType.Name</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
 
-@if (Model.Plan == null)
-{
-    <p>Please select a plan above to view events.</p>
-}
+    @if (Model.Plan == null)
+    {
+        <p>Please select a plan above to view events.</p>
+    }
 
-<script>
+    <script>
     //$("#theEventsTable").on("click", "tr", function (e) {
     //    alert($(e.currentTarget).index() + 1);
     //});
@@ -128,29 +148,29 @@
             }
         );
     };
-</script>
+    </script>
 
-@*function updateApron(apronID) {
-    $.post(
-        "@Url.Action("UpdateLeadApron", "LeadAprons")",
-        {
-        ID: apronID,
-        ApronIdentifier: $("#ApronIdentifier").val(),
-        Description: $("#Description").val(),
-        IsRetired: $("#IsRetired").prop('checked'),
-        Location: $("#Location").val(),
-        ApronTypeID: $("#ApronTypeID").val(),
-        InstitutionID: $("#InstitutionID").val(),
-        FacilityID: $("#FacilityID").val(),
-        DepartmentID: $("#DepartmentID").val()
-        },
-        function (result) {
-        if (result =="True") {
-        alert(result);
-        alert("Apron was updated successfully.");
-        }
-        else {
-        alert("There was a problem with updating the lead apron. Please review your entries above and resubmit.");
-        }
+    @*function updateApron(apronID) {
+        $.post(
+            "@Url.Action("UpdateLeadApron", "LeadAprons")",
+            {
+            ID: apronID,
+            ApronIdentifier: $("#ApronIdentifier").val(),
+            Description: $("#Description").val(),
+            IsRetired: $("#IsRetired").prop('checked'),
+            Location: $("#Location").val(),
+            ApronTypeID: $("#ApronTypeID").val(),
+            InstitutionID: $("#InstitutionID").val(),
+            FacilityID: $("#FacilityID").val(),
+            DepartmentID: $("#DepartmentID").val()
+            },
+            function (result) {
+            if (result =="True") {
+            alert(result);
+            alert("Apron was updated successfully.");
+            }
+            else {
+            alert("There was a problem with updating the lead apron. Please review your entries above and resubmit.");
+            }
 
-        });*@
+            });*@

@@ -1,16 +1,106 @@
-﻿@{
+﻿@model PlanGPS.Models.DashboardViewModel
+
+@{
     ViewBag.Title = "Home Page";
 }
 
-<div class="jumbotron">
-    <h1>PlanGPS</h1>
-    <p class="lead">PlanGPS is a tracking software for visulaizing patient planning and providing statistics on the entire process.</p>
-    <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
-</div>
+@*<div class="jumbotron">
+        <h1>PlanGPS</h1>
 
-<div class="row">
+    </div>*@
+@if (Model.PlansExist)
+{
+    <div style="margin-top:20px;">
+        <div class="container" style="width:1000px">
+            <p class="lead" style="text-align:center">Current Cyberknife Patients </p>
+            <div id="currentPlansTable" style="background-color:#f2f2f2">
+                @Html.Action("_CurrentPlansTable", "Home")
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="outerDIV" style="background-color:#f2f2f2; margin: auto; padding:5px; justify-content: center; display:flex; width: 1000px">
+            <div class="itemDIV" style="background-color:white; margin:5px auto; display:inline-block; width:250px; height:160px;border-width:1px; border-color:black; border-style:solid ">
+                @Html.Action("_CKPlanTypeDistributionPlot", "Home")
+            </div>
+            <div class="itemDIV" style="background-color:white; margin:5px auto; display:inline-block; width:250px; height:160px; border-width:1px; border-color:black; border-style:solid">
+                @Html.Action("_CKDocDistributionPlot", "Home")
+            </div>
+            <div class="itemDIV" style="background-color:white; margin:5px auto; display:inline-block">
+                @Html.Action("_CKPhysicsDistributionPlot", "Home")
+            </div>
+            <br />
+            @*<div class="itemDIV" style="background-color:white; margin:5px; width:400px; display:inline-block">
+                @Html.Action("_CKPlanTypeDistributionPlot", "Home")
+            </div>
+            <div class="itemDIV" style="background-color:white; margin:5px; width:400px; display:inline-block">
+                @Html.Action("_CKDocDistributionPlot", "Home")
+            </div>
+        <div class="itemDIV" style="background-color:white; width:300px; height:100px; margin:4px; float:left">
+                Distribution per Doc
+            </div>*@
+        </div>
+
+
+    </div>
+    @*<div style="margin-top:20px; width:400px; height:1050px">
+            <p>
+                This is test canvas
+                <canvas id="testChart" >
+                </canvas>
+
+        </div>*@
+}
+else
+{
+    <div style="margin-top:20px; width:100px; height:100px">
+        <p style="text-align:center">There are no plans in the database.</p>
+    </div>
+}
+
+@*<script>
+    //import * as Chart from "../../Scripts/Chart";
+
+        //Chart.scaleService.updateScaleDefaults('linear', { ticks: { min: 0 } });
+
+        var ctx = document.getElementById('testChart').getContext('2d');
+
+        var chart = new Chart(ctx, {
+            // The type of chart we want to create
+            type: 'bar',
+
+            // The data for our dataset
+            data: {
+                labels: ['January', 'February', 'March'],
+                datasets: [{
+                    label: 'My First dataset',
+                    backgroundColor: ['red', 'blue', 'green'],
+                    //borderColor: 'rgb(255, 99, 132)',
+                    data: [20, 10, 5]
+                }]
+            },
+
+            // Configuration options go here
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            min: 0
+                        }
+                    }]
+                }
+            }
+        });
+
+
+
+
+    </script>*@
+
+
+@*<div class="row">
     <div class="col-md-4">
-        <h2>Getting started</h2>
+
         <p>
             We will have graphs and tables that provide detailed analysis of the planning process.
         </p>
@@ -25,5 +115,4 @@
         <h2>Web Hosting</h2>
         <p>This will be the best software application you have ever used.</p>
         <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-    </div>
-</div>
+    </div>*@

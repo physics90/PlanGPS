@@ -1,0 +1,133 @@
+﻿@model PlanGPS.Models._CKPlanTypeDistributionViewModel
+
+
+@*<div style="border-width: 1px; border-color: black; border-style: dashed">*@
+    <canvas id="planDistChart" style="width:250px; height:160px"></canvas>
+@*</div>*@
+
+<script>
+    //Chart.scaleService.updateScaleDefaults('linear', { ticks: { min: 0 } });
+    @* $.getJSON("@Url.Action("GetPlansPerDoc", "HomeData")").done(function (plotData) {
+        console.log(plotData);*@
+    $(document).ready(plotIt());
+
+    function plotIt() {
+        const ctx = document.getElementById('planDistChart').getContext('2d');
+        const xLabels = [];
+        const yData = [];
+        const bgColor = [];
+
+        $.ajax
+        ({
+            type: 'get',
+            url: "@Url.Action("GetPlansPerTypes", "HomeData")",
+            dataType: 'json',
+            success: function (rawData)
+            {
+
+                rawData.forEach(dp =>
+                {
+                    xLabels.push(dp.DPName);
+                    yData.push(dp.DPValue);
+                    bgColor.push(dp.DPColor);
+                });
+
+                var chart = new Chart(ctx, {
+                    type: 'pie',
+                    data:
+                    {
+                        labels: xLabels,
+                        datasets: [{
+                            label: '',
+                            backgroundColor: bgColor,
+                            //borderColor: 'rgb(255, 99, 132)',
+                            data: yData
+                        }]
+                    },
+                    options:
+                    {
+                        layout: { padding: 2 },
+                        legend:
+                        {
+                            position: 'right',
+                            labels: { fontSize: 10, padding: 5 }
+                        },
+                        title:
+                        {
+                            display: true,
+                            text: 'Plans Per Plan Type'
+                        }
+                    }
+                    // Configuration options go here
+                    //options: {
+                    //    scales: {
+                    //        yAxes: [{
+                    //            ticks: {
+                    //                min: 0
+                    //            }
+                    //        }]
+                    //    }
+                    //}
+                });
+            }
+        });
+    };
+
+
+
+
+</script>
+
+@*@using Highsoft.Web.Mvc.Charts
+    @using Highsoft.Web.Mvc.Charts.Rendering
+    @using System.Collections
+
+    @{
+
+        var chartOptions = new Highcharts
+        {
+            //Chart = new Highsoft.Web.Mvc.Charts.Chart
+            //{
+            //    PlotBackgroundColor = null,
+            //    PlotBorderWidth = null,
+            //    PlotShadow = new Shadow
+            //    {
+            //        Enabled = false
+            //    }
+            //},
+            Title = new Title
+            {
+                Text = "CK Distribution by Plan Type"
+            },
+            Tooltip = new Tooltip
+            {
+                PointFormat = "{series.name}: <b>{point.percentage:.1f}%</b>"
+            },
+            PlotOptions = new PlotOptions
+            {
+                Pie = new PlotOptionsPie
+                {
+                    AllowPointSelect = true,
+                    Cursor = PlotOptionsPieCursor.Pointer,
+                    DataLabels = new Hashtable { { "enabled", true }, { "distance", "10" }, { "format", "<b>{point.name}</b>: {point.percentage:.1f} %" } },
+                    //ShowInLegend = true,
+                    Size = "80%"
+                }
+            },
+            Series = new List<Series>
+                                   {
+                new PieSeries
+                {
+                        Name = "Plan Type",
+                        Data =  Model.PlotData
+                },
+
+                                                                   }
+        };
+
+        chartOptions.ID = "planTypeDistPlot";
+        var renderer = new HighchartsRenderer(chartOptions);
+
+
+        @Html.Raw(renderer.RenderHtml());
+    }*@

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Entity.Migrations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,13 +19,110 @@ namespace DataAccessLayer
 
             if (context.PlanType.Count() == 0)
             {
-                LoadEventTypes();
-                LoadPhysicists();
-                LoadNeuros();
-                LoadRadOncs();
-                LoadPlanTypes();
+                LoadInitialData lid = new LoadInitialData(context);
+                lid.LoadEventDurationCategories();
+                lid.LoadEventTypes();
+                lid.LoadPhysicists();
+                lid.LoadNeuros();
+                lid.LoadRadOncs();
+                lid.LoadPlanTypes();
             }
             
+        }
+
+        public List<Plan> GetAllPlans()
+        {
+            return context.Plan.ToList();
+        }
+
+        public bool DoStatsExistForPlanWithPlanID(int planID)
+        {
+            bool exist = context.PlanningStats.Any(ps => ps.Plan.ID == planID);
+
+            return exist;
+        }
+
+        public PlanningStats GetPlanningStatsWithPlanID(int planID)
+        {
+            PlanningStats ps = (from p in context.PlanningStats
+                                where p.Plan.ID == planID
+                                select p).First();
+
+            return ps;
+        }
+
+        public int CountNumberOfPlansForRadOnc(int roID)
+        {
+            int numPlans = (from p in context.Plan
+                            where p.RadOnc.ID == roID
+                            select p).Count();
+
+            return numPlans;
+        }
+
+        public List<EventDurationCategory> GetEventDurationCategories(string category)
+        {
+            List<EventDurationCategory> categories = (from ev in context.EventDurationCategory
+                                                      where ev.Name == category
+                                                      select ev).ToList();
+
+            return categories;
+        }
+
+        public List<Plan> GetAllCompletedPlans()
+        {
+            List<Plan> plans = (from p in context.Plan
+                          where p.IsInPlanning == true
+                          select p).ToList();
+
+            return plans;
+        }
+
+        public List<PlanType> GetAllPlanTypes()
+        {
+            List<PlanType> pt = (from p in context.PlanType
+                                 select p).ToList();
+
+            return pt;
+        }
+
+        public int CountNumberOfPlansForType(int planTypeID)
+        {
+            int numPlans = (from p in context.Plan
+                            where p.PlanType.ID == planTypeID
+                            select p).Count();
+
+            return numPlans;
+        }
+
+        public List<Plan> GetAllCurrentPlans()
+        {
+            context = new PlanGPSContext();
+
+            List<Plan> planList = (from p in context.Plan
+                                   where p.IsInPlanning == true
+                                   select p).ToList();
+
+            return planList;
+        }
+
+        public bool SetPlanToComplete(int planID)
+        {
+            Plan plan = context.Plan.Find(planID);
+
+            bool success;
+            plan.IsInPlanning = false;
+            try
+            {
+                context.SaveChanges();
+                success = true;
+            }
+            catch (Exception)
+            {
+                success = false;
+            }
+
+            return success;
         }
 
         public List<EventType> GetAllEventTypes()
@@ -32,9 +130,72 @@ namespace DataAccessLayer
             return context.EventType.ToList();
         }
 
+        public List<EventType> GetAllEventTypeStages(bool isLot)
+        {
+            List<EventType> ets = new List<EventType>();
+
+            ets = (from ev in context.EventType
+                   where ev.IsAStage == true
+                   select ev).ToList();
+
+            EventType lotEvent = ets.Where(ev => ev.StageID == 2).First();
+            //if (!isLot)
+            //{
+            //    ets.Remove(lotEvent);
+            //}
+
+            return ets;
+        }
+
+        public List<Event> GetAllStagesForPlan(int planID)
+        {
+            List<Event> eventList = (from ev in context.Event
+                          where ev.PlanID == planID
+                          where ev.EventType.IsAStage == true
+                          orderby ev.EventDate
+                          select ev).ToList();
+
+            return eventList;
+        }
+
         public Plan GetPlanWithPlanID(int planID)
         {
             return context.Plan.Find(planID);
+        }
+
+        public bool UpdateStats(PlanningStats stats)
+        {
+            bool success;
+
+            try
+            {
+                context.PlanningStats.AddOrUpdate(stats);
+                context.SaveChanges();
+                success = true;
+            }
+            catch (Exception)
+            {
+                success = false;
+            }
+
+            return success;
+        }
+        public bool SaveStats(PlanningStats stats)
+        {
+            bool success;
+
+            try
+            {
+                context.PlanningStats.AddOrUpdate(stats);
+                context.SaveChanges();
+                success = true;
+            }
+            catch (Exception)
+            {
+                success = false;
+            }
+
+            return success;
         }
 
         public List<Plan> GetAllPlansWithPatientID(int patientID)
@@ -60,7 +221,7 @@ namespace DataAccessLayer
         public bool AddNewPlan(int patientID, bool isInPlanning, bool hasPreApproval, int physicistID, int radOncID, int neuroID, string planName, int planTypeID)
         {
             Plan plan = new Plan();
-            bool success;
+            bool success = true;
             try
             {
                 plan.PlanName = planName;
@@ -76,13 +237,45 @@ namespace DataAccessLayer
                 context.Plan.Add(plan);
                 context.SaveChanges();
 
-                success = true;
+                //Add an initial event to plan
+                EventType initialEv = (from evt in context.EventType
+                                       where evt.StageID == 0
+                                       select evt).First();
+
+                bool didAddInsApproval;
+                if (plan.HasPreApproval)
+                {
+                    EventType insuranceEvent = (from evt in context.EventType
+                                                where evt.StageID == -1
+                                                select evt).First();
+
+                    try
+                    {
+                        didAddInsApproval = AddNewEvent(plan.ID, insuranceEvent.ID, DateTime.Now);
+                    }
+                    catch (Exception)
+                    {
+                        didAddInsApproval = false;
+                        success = false;
+                    }
+                }
+
+                bool didAddEvent;
+                try
+                {
+                    didAddEvent = AddNewEvent(plan.ID, initialEv.ID, DateTime.Now);
+                }
+                catch (Exception)
+                {
+                    didAddEvent = false;
+                    success = false;
+                }
             }
             catch (Exception)
             {
                 success = false;
-            }
-
+            }         
+           
             return success;
         }
 
@@ -113,14 +306,14 @@ namespace DataAccessLayer
             {
                 EventType et = context.EventType.Find(eventTypeID);
 
-                Event e = new Event()
+                Event evnt = new Event()
                 {
                     EventDate = dt,
                     EventType = et,
                     PlanID = planID
                 };
 
-                context.Event.Add(e);
+                context.Event.Add(evnt);
                 context.SaveChanges();
 
                 success = true;
@@ -199,397 +392,5 @@ namespace DataAccessLayer
 
             return wasDeleted;
         }
-
-
-
-
-        //Creating Database Data
-        #region Create Database Data
-        public void LoadEventTypes()
-        {
-            List<EventType> etList = new List<EventType>();
-            EventType et = new EventType()
-            {
-                Name = "Planning CT Performed",
-                Description = "Planning CT performed and process started",
-                IsAStage = true,
-                StageID = "0",
-                CurrentStageName = "Imaging"
-            };
-
-            etList.Add(et);
-
-            et = new EventType()
-            {
-                Name = "Imaging Completed",
-                Description = "All imaging has been completed",
-                IsAStage = true,
-                StageID = "1",
-                CurrentStageName = "Image Import (Physics)"
-            };
-
-            etList.Add(et);
-
-            et = new EventType()
-            {
-                Name = "Image Import and Fusion Completed",
-                Description = "Importing of all images for planning has been completed",
-                IsAStage = true,
-                StageID = "2",
-                CurrentStageName = "Contouring (Physician)"
-            };
-
-            et = new EventType()
-            {
-                Name = "Image Import for LOT Simulation",
-                Description = "Importing of all images for LOT Simulation has been completed",
-                IsAStage = true,
-                StageID = "2",
-                CurrentStageName = "LOT Planning (Physics)"
-            };
-
-            etList.Add(et);
-
-            et = new EventType()
-            {
-                Name = "LOT Sim Completed",
-                Description = "LOT Simulation completed",
-                IsAStage = true,
-                StageID = "2a",
-                CurrentStageName = "LOT Simulation"
-            };
-
-            etList.Add(et);
-
-            et = new EventType()
-            {
-                Name = "LOT Imported",
-                Description = "LOT Simulation imported",
-                IsAStage = true,
-                StageID = "2b",
-                CurrentStageName = "Contouring (Physician)"
-            };
-
-            etList.Add(et);
-
-            et = new EventType()
-            {
-                Name = "Contouring Completed",
-                Description = "Physician contouring started",
-                IsAStage = true,
-                StageID = "3",
-                CurrentStageName = "Planning (Physics)"
-            };
-
-            etList.Add(et);
-
-            et = new EventType()
-            {
-                Name = "Plan Ready for Review",
-                Description = "Plan is ready for physician review",
-                IsAStage = true,
-                StageID = "4",
-                CurrentStageName = "Physician Review (Rad Onc)"
-            };
-
-            etList.Add(et);
-
-            et = new EventType()
-            {
-                Name = "Plan Reviewed, Revision Requested",
-                Description = "Physician reviewed plan",
-                IsAStage = true,
-                StageID = "5",
-                CurrentStageName = "Planning (Physics)"
-            };
-
-            et = new EventType()
-            {
-                Name = "Plan Approved",
-                Description = "Physician approved plan",
-                IsAStage = true,
-                StageID = "5",
-                CurrentStageName = "Planning (Physics)"
-            };
-
-            etList.Add(et);
-
-            et = new EventType()
-            {
-                Name = "Planning Finalized",
-                Description = "Planning finialized for second check.",
-                IsAStage = true,
-                StageID = "6",
-                CurrentStageName = "Second check (Physics)"
-            };
-
-            etList.Add(et);
-
-            et = new EventType()
-            {
-                Name = "Physics Second Check Done",
-                Description = "Plan has been second checked and ready for scheduling",
-                IsAStage = true,
-                StageID = "7",
-                CurrentStageName = "Scheduling (Therapist)"
-            };
-
-            etList.Add(et);
-
-            et = new EventType()
-            {
-                Name = "Plan Scheduled",
-                Description = "Patient has been scheduled for treatment",
-                IsAStage = true,
-                StageID = "8",
-                CurrentStageName = "Waiting for treatmen to start (Patient)"
-            };
-
-            etList.Add(et);
-
-            et = new EventType()
-            {
-                Name = "Treatment Started",
-                Description = "Treatment has  started",
-                IsAStage = true,
-                StageID = "9",
-                CurrentStageName = "Completed"
-            };
-
-            etList.Add(et);
-
-            et = new EventType()
-            {
-                Name = "Planning CT",
-                Description = "Planning CT Date",
-                IsAStage = false,
-                StageID = null,
-                CurrentStageName = ""
-            };
-
-            etList.Add(et);
-
-            et = new EventType()
-            {
-                Name = "Outside CT",
-                Description = "Additional CT",
-                IsAStage = false,
-                StageID = null,
-                CurrentStageName = ""
-
-            };
-
-            etList.Add(et);
-
-            et = new EventType()
-            {
-                Name = "MRI Imaging",
-                Description = "MRI Date",
-                IsAStage = false,
-                StageID = null,
-                CurrentStageName = ""
-            };
-
-            etList.Add(et);
-
-            et = new EventType()
-            {
-                Name = "PET Imaging",
-                Description = "PET Date",
-                IsAStage = false,
-                StageID = null,
-                CurrentStageName = ""
-            };
-
-            etList.Add(et);
-
-            et = new EventType()
-            {
-                Name = "Fiducial Placement",
-                Description = "Fiducial placement",
-                IsAStage = false,
-                StageID = null,
-                CurrentStageName = ""
-            };
-
-            etList.Add(et);
-
-            et = new EventType()
-            {
-                Name = "Reimaging",
-                Description = "New/Additional imaging required",
-                IsAStage = true,
-                StageID = "20",
-                CurrentStageName = "Imaging"
-            };
-
-            etList.Add(et);
-
-            et = new EventType()
-            {
-                Name = "Re Eval Plan Type",
-                Description = "New/Additional imaging required",
-                IsAStage = true,
-                StageID = "21",
-                CurrentStageName = "Planning (Physics)"
-            };
-
-            etList.Add(et);
-
-            et = new EventType()
-            {
-                Name = "Insurance Approval",
-                Description = "Date of Insurance Approval/Pre-Approval",
-                IsAStage = true,
-                StageID = "30",
-                CurrentStageName = ""
-            };
-
-            etList.Add(et);
-
-            context.EventType.AddRange(etList);
-            context.SaveChanges();
-
-            //foreach (EventType eventType in etList)
-            //{
-            //    context.EventType.AddRange
-            //}
-
-
-        }
-
-        private void LoadPhysicists()
-        {
-            Physicist ph = new Physicist()
-            {
-                FirstName = "Jeff",
-                LastName = "Garrett",
-                IsPhysician = false
-            };
-
-            context.Physicist.Add(ph);
-            context.SaveChanges();
-
-            Physicist ph2 = new Physicist()
-            {
-                FirstName = "Chris",
-                LastName = "Westbrook",
-                IsPhysician = false
-            };
-
-            context.Physicist.Add(ph2);
-            context.SaveChanges();
-        }
-
-        private void LoadRadOncs()
-        {
-            List<RadOnc> roList = new List<RadOnc>();
-            RadOnc ro = new RadOnc()
-            {
-                FirstName = "Jeanann",
-                LastName = "Suggs",
-                IsPhysician = true
-            };
-
-            roList.Add(ro);
-
-            ro = new RadOnc()
-            {
-                FirstName = "Richard",
-                LastName = "Friedman",
-                IsPhysician = true
-            };
-
-            roList.Add(ro);
-
-            ro = new RadOnc()
-            {
-                FirstName = "Margaret",
-                LastName = "Wadsworth",
-                IsPhysician = true
-            };
-
-            roList.Add(ro);
-
-            ro = new RadOnc()
-            {
-                FirstName = "Eric",
-                LastName = "Balfour",
-                IsPhysician = true
-            };
-
-            roList.Add(ro);
-
-            context.RadOnc.AddRange(roList);
-            context.SaveChanges();
-
-        }
-
-        private void LoadNeuros()
-        {
-            Neurosurgeon ns = new Neurosurgeon()
-            {
-                FirstName = "Matthew",
-                LastName = "Vanlandingham",
-                IsPhysician = true
-            };
-
-            context.Neurosurgeon.Add(ns);
-            context.SaveChanges();
-        }
-
-        private void LoadPlanTypes()
-        {
-            List<PlanType> ptList = new List<PlanType>();
-
-            PlanType pt = new PlanType()
-            {
-                Type = "Intracranial",
-                Description = "Brain (Intracranial) with 6DOF Skull tracking",
-                IsLOT = false
-            };
-
-            ptList.Add(pt);
-
-            pt = new PlanType()
-            {
-                Type = "Body, Spine Tracking",
-                Description = "Body with tracking on spine",
-                IsLOT = false
-            };
-
-            ptList.Add(pt);
-
-            pt = new PlanType()
-            {
-                Type = "Body, Fiducial (Non-Synchrony)",
-                Description = "Body using fiducials for motion tracking without Synchrony",
-                IsLOT = false
-            };
-
-            ptList.Add(pt);
-
-            pt = new PlanType()
-            {
-                Type = "Body, Synchrony",
-                Description = "Body using fiducials with Synchrony",
-                IsLOT = false
-            };
-
-            ptList.Add(pt);
-
-            pt = new PlanType()
-            {
-                Type = "Lung LOT",
-                Description = "Lung using LOT Planning",
-                IsLOT = true
-            };
-
-            ptList.Add(pt);
-            context.PlanType.AddRange(ptList);
-            context.SaveChanges();
-
-        }
-        #endregion
     }
 }

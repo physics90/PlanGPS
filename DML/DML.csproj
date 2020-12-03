@@ -53,12 +53,14 @@
   <ItemGroup>
     <Compile Include="Analytics.cs" />
     <Compile Include="Event.cs" />
+    <Compile Include="EventDurationCategory.cs" />
     <Compile Include="EventType.cs" />
     <Compile Include="Neurosurgeon.cs" />
     <Compile Include="Patient.cs" />
     <Compile Include="Physicist.cs" />
     <Compile Include="Plan.cs" />
     <Compile Include="PlanGPSContext.cs" />
+    <Compile Include="PlanningStats.cs" />
     <Compile Include="PlanType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RadOnc.cs" />

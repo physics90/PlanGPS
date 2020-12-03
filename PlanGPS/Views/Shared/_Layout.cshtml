@@ -5,13 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - PlanGPS</title>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="/resources/demos/style.css">
+    @*<link rel="stylesheet" href="/resources/demos/style.css">*@
+    @*<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/slate/bootstrap.min.css" integrity="sha384-8iuq0iaMHpnH2vSyvZMSIqQuUnQA7QM+f6srIdlgBrTSEyd//AWNMyEaSF2yPzNQ" crossorigin="anonymous">*@
     @Styles.Render("~/Content/css")
     @Styles.Render("~/Content/themes/base/css")
     @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/jqueryui")
+
+    @*Chart.js includes*@
+    @Styles.Render("~/Content/chartjs")
+    @Scripts.Render("~/bundles/chartjs")
 
 </head>
 <body>
@@ -38,15 +43,15 @@
             </div>
         </div>
     </div>
-    <div class="container body-content">
-        @RenderBody()
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - PlanGPS</p>
-        </footer>
-    </div>
+        <div class="container body-content">
+            @RenderBody()
+            <hr />
+            <footer style="clear:both">
+                <p>&copy; @DateTime.Now.Year - PlanGPS</p>
+            </footer>
+        </div>
 
-    
-    @RenderSection("scripts", required: false)
+
+        @RenderSection("scripts", required: false)
 </body>
 </html>

@@ -1,0 +1,29 @@
+﻿<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+
+@model PlanGPS.Models._AverageTimesByStaffViewModel
+@using Highsoft.Web.Mvc.Charts
+@using Highsoft.Web.Mvc.Charts.Rendering
+@using System.Collections
+
+@{ var chartOptions = new Highcharts
+    {
+        Title = new Title { Text = "Average Times By Staff" },
+        Subtitle = new Subtitle { Text = "Source: WorldClimate.com" },
+
+        XAxis = new List<XAxis> @*Have a property for xaxis categories*@
+        { new XAxis
+            { Categories = new List<string>
+                {
+                    "Jan",
+                    "Feb",
+                }
+            }
+        }
+   };
+
+chartOptions.ID = "avgTimesByStaffChart";
+var renderer = new HighchartsRenderer(chartOptions);
+}
+
+@Html.Raw(renderer.RenderHtml())

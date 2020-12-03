@@ -12,12 +12,20 @@ namespace PlanGPS.Models
         DAL dal = new DAL();
         public Patient Patient { get; set; }
         public List<Plan> PlanList { get; set; }
+        public int InitialPlanID { get; set; }
 
         public ManagePlanEventsViewModel(int patientID)
         {
             Patient = dal.GetPatientByID(patientID);
             PlanList = dal.GetAllPlansWithPatientID(patientID);
+            InitialPlanID = -1;
+        }
 
+        public ManagePlanEventsViewModel(int patientID, int planID)
+        {
+            Patient = dal.GetPatientByID(patientID);
+            PlanList = dal.GetAllPlansWithPatientID(patientID);
+            InitialPlanID = planID;
         }
 
         public string GetCurrentStageForPlanID(int planID)
@@ -32,7 +40,7 @@ namespace PlanGPS.Models
                                      select e).Last();
             }
             
-            return currentEvent == null ? "No CurrentStage Exists." :  currentEvent.EventType.CurrentStageName;
+            return currentEvent == null ? "No CurrentStage Exists." :  currentEvent.EventType.Name;
                     
         }
     }
